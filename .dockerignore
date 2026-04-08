@@ -1,0 +1,10 @@
+.git
+.vs
+**/bin
+**/obj
+**/node_modules
+**/build
+**/build-check*
+**/bincheck
+**/objcheck
+**/.DS_Store
