@@ -12,6 +12,7 @@ namespace DataBase.Users
         public int AssignedToUserId { get; set; }
         public User? AssignedToByUser { get; set; }
         public Status Status { get; set; }
+        public int? ManagerRating { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<TaskFile> Files { get; set; } = new();
 

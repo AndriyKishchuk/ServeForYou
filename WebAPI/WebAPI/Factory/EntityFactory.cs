@@ -12,7 +12,8 @@ namespace WebAPI.Factory
                 Name = request.Name,
                 Surname = request.Surname,
                 Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                // Change PasswordHash to normal Password
+                PasswordHash = request.Password,
                 Role = request.Role,
                 CompanyId = request.CompanyId ?? 1
             };

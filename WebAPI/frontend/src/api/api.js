@@ -49,7 +49,7 @@ export const taskApi = {
   createCustomerRequest: (data) => api.post("/task/customer-request", data),
   assignToEmployee: (id, employeeUserId) => api.patch(`/task/${id}/assign`, { employeeUserId }),
   returnToCustomer: (id) => api.patch(`/task/${id}/return-to-customer`),
-  complete: (id) => api.patch(`/task/${id}/complete`),
+  complete: (id, managerRating) => api.patch(`/task/${id}/complete`, { managerRating }),
   updateStatus: (id, status) => api.patch(`/task/${id}/status`, JSON.stringify(status), {
     headers: { "Content-Type": "application/json" },
   }),

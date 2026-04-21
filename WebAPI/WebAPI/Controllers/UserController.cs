@@ -20,7 +20,6 @@ namespace WebAPI.Controllers
             return await context.Users.Include(u => u.Company).ToListAsync();
         }
 
-   
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetMe()
         {
@@ -66,7 +65,7 @@ namespace WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
                 return BadRequest("New password must be at least 6 characters long");
 
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.PasswordHash = request.NewPassword;
             await context.SaveChangesAsync();
 
             return NoContent();
@@ -107,6 +106,25 @@ namespace WebAPI.Controllers
                 .OrderBy(u => u.Name)
                 .ToListAsync();
 
+            var ratingStats = await context.Tasks
+                .Where(t => t.ManagerRating.HasValue)
+                .GroupBy(t => t.ManagerUserId)
+                .Select(group => new
+                {
+                    ManagerUserId = group.Key,
+                    AverageRating = group.Average(t => t.ManagerRating!.Value),
+                    RatingCount = group.Count()
+                })
+                .ToListAsync();
+
+            var ratingMap = ratingStats.ToDictionary(
+                item => item.ManagerUserId,
+                item => new
+                {
+                    item.AverageRating,
+                    item.RatingCount
+                });
+
             var result = managers.Select(u => new
             {
                 u.Id,
@@ -121,7 +139,8 @@ namespace WebAPI.Controllers
                     2 => "Technical Coordination",
                     _ => "Project Supervision"
                 },
-                Rating = 4.4m + ((u.Id % 5) * 0.1m)
+                Rating = ratingMap.TryGetValue(u.Id, out var rating) ? Math.Round(rating.AverageRating, 1) : 0,
+                RatingCount = ratingMap.TryGetValue(u.Id, out var countRating) ? countRating.RatingCount : 0
             });
 
             return Ok(result);

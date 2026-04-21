@@ -71,14 +71,19 @@ export default function ManagerDirectoryPage() {
             filteredManagers.map((manager) => (
               <article key={manager.id} className="manager-profile-card">
                 <div className="manager-profile-top">
-                  <span className="workspace-badge">{manager.rating}/5</span>
+                  <span className="workspace-badge">
+                    {manager.ratingCount ? `${manager.rating}/5` : "No ratings yet"}
+                  </span> 
                   <strong>
                     {manager.name} {manager.surname}
                   </strong>
                 </div>
                 <p>{manager.specialization}</p>
                 <span>{manager.email}</span>
-                <small>{manager.companyName}</small>
+                <small>
+                  {manager.companyName}
+                  {manager.ratingCount ? ` • ${manager.ratingCount} ratings` : ""}
+                </small>
                 <Link className="primary-action" to={`/customer/orders/new?managerId=${manager.id}`}>
                   Order from this manager
                 </Link>

@@ -207,7 +207,7 @@ namespace WebAPI.Controllers
 
         [HttpPatch("{id}/complete")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Tasks>> CompleteTask(int id)
+        public async Task<ActionResult<Tasks>> CompleteTask(int id, [FromBody] CompleteTaskRequest request)
         {
             var task = await context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
@@ -218,6 +218,11 @@ namespace WebAPI.Controllers
             {
                 return BadRequest("Only tasks returned to customer can be marked as done");
             }
+
+            if (request.ManagerRating < 1 || request.ManagerRating > 5)
+                return BadRequest("Manager rating must be between 1 and 5");
+
+            task.ManagerRating = request.ManagerRating;
             task.Status = Status.Done;
             await context.SaveChangesAsync();
 

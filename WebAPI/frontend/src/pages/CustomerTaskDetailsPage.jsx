@@ -22,6 +22,7 @@ export default function CustomerTaskDetailsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(true);
+  const [managerRating, setManagerRating] = useState("5");
 
   const resultFiles = useMemo(() => files.filter((file) => file.category === "Result"), [files]);
 
@@ -76,7 +77,7 @@ export default function CustomerTaskDetailsPage() {
     setSuccess("");
 
     try {
-      const { data } = await taskApi.complete(taskId);
+      const { data } = await taskApi.complete(taskId, Number(managerRating));
       setTask((current) => ({ ...current, ...data }));
       setSuccess("Task confirmed and marked as done.");
     } catch (err) {
@@ -146,8 +147,15 @@ export default function CustomerTaskDetailsPage() {
 
             {task.status === "ReturnedToAdmin" ? (
               <div className="form-actions-row">
+                <select value={managerRating} onChange={(event) => setManagerRating(event.target.value)}>
+                  <option value="5">5 / 5</option>
+                  <option value="4">4 / 5</option>
+                  <option value="3">3 / 5</option>
+                  <option value="2">2 / 5</option>
+                  <option value="1">1 / 5</option>
+                </select>
                 <button className="primary-action" onClick={handleComplete}>
-                  Everything is okay
+                  Confirm and rate manager
                 </button>
               </div>
             ) : null}
