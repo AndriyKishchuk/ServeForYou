@@ -12,7 +12,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(AplicationContext context, JwtService jwtService) : ControllerBase
+    public class AuthController(AplicationContext context, IJwtService jwtService) : ControllerBase
     {
         [HttpPost("login")]
         public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequests loginRequest)
@@ -37,16 +37,14 @@ namespace WebAPI.Controllers
             if (await context.Users.AnyAsync(u => u.Email == request.Email))
                 return BadRequest("Email already in use");
 
-            var company = request.CompanyId.HasValue
-                ? await context.Companies.FirstOrDefaultAsync(c => c.Id == request.CompanyId.Value)
-                : await context.Companies.OrderBy(c => c.Id).FirstOrDefaultAsync();
+            var company = await context.Companies.FirstOrDefaultAsync(c => c.Id == request.CompanyId)
+                          ?? await context.Companies.FirstOrDefaultAsync(c => c.CompanyName == "ServeForYou");
 
-            if (company is null)
-            {
-                company = new Company { CompanyName = "ServeForYou" };
-                context.Companies.Add(company);
-                await context.SaveChangesAsync();
-            }
+            if (company == null)
+                return BadRequest("Invalid company ID");
+
+            if (request.CompanyId.HasValue && request.CompanyId != company.Id)
+                return BadRequest("Invalid company ID");
 
             if (!string.Equals(company.CompanyName, "ServeForYou", StringComparison.Ordinal))
             {
@@ -67,7 +65,7 @@ namespace WebAPI.Controllers
                                        user.CompanyId, redirectUrl, token));
         }
 
-      
+
         [HttpGet("me")]
         [Authorize]
         public async Task<ActionResult<AuthResponse>> GetMe()
@@ -77,17 +75,17 @@ namespace WebAPI.Controllers
             if (user is null) return NotFound();
 
             var redirectUrl = GetRedirectUrl(user.Role);
-           
+
             return Ok(new AuthResponse(user.Id, user.Name, user.Email, user.Role,
                                        user.CompanyId, redirectUrl, string.Empty));
         }
 
         private static string GetRedirectUrl(UserRole role) => role switch
         {
-            UserRole.Admin    => "/customer/overview",
-            UserRole.Manager  => "/manager/dashboard",
-            UserRole.Employee => "/employee/tasks",  
-            _                => "/login"
+            UserRole.Admin => "/customer/overview",
+            UserRole.Manager => "/manager/dashboard",
+            UserRole.Employee => "/employee/tasks",
+            _ => "/login"
         };
     }
 }
