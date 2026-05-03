@@ -52,6 +52,7 @@ namespace WebAPI.Tests.Factory
                Role: UserRole.Manager,
                CompanyId: null
             );
+            
             //Act 
             var user = _factory.CreateUser(request);
 

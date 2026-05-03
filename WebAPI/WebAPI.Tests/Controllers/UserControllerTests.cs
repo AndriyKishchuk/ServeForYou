@@ -8,6 +8,7 @@ using Moq;
 using WebAPI.Controllers;
 using WebAPI.Factory;
 using WebAPI.Models.Request;
+using WebAPI.Services;
 
 namespace WebAPI.Tests.Controllers
 {
@@ -25,7 +26,8 @@ namespace WebAPI.Tests.Controllers
 
             _context = new AplicationContext(options);
             _factoryMock = new Mock<IEntityFactory>();
-            _controller = new UserController(_context);
+            var userService = new UserService(_context, _factoryMock.Object);
+            _controller = new UserController(userService);
         }
 
         private void SetUserClaims(int userId, UserRole role, int companyId)

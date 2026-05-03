@@ -6,6 +6,7 @@ using Moq;
 using WebAPI.Controllers;
 using WebAPI.Factory;
 using WebAPI.Models.Request;
+using WebAPI.Services;
 
 namespace WebAPI.Tests.Controllers
 {
@@ -23,7 +24,8 @@ namespace WebAPI.Tests.Controllers
 
             _context = new AplicationContext(options);
             _factoryMock = new Mock<IEntityFactory>();
-            _controller = new CompanyController(_context);
+            var companyService = new CompanyService(_context, _factoryMock.Object);
+            _controller = new CompanyController(companyService);
         }
 
         [Fact]
@@ -58,7 +60,7 @@ namespace WebAPI.Tests.Controllers
             var company = new Company { Id = 5, CompanyName = "ServeForYou" };
             _factoryMock.Setup(f => f.CreateCompany(request)).Returns(company);
 
-            var result = await _controller.CreateCompany(request, _factoryMock.Object);
+            var result = await _controller.CreateCompany(request);
 
             var created = Assert.IsType<CreatedAtActionResult>(result.Result);
             created.ActionName.Should().Be(nameof(CompanyController.GetCompany));

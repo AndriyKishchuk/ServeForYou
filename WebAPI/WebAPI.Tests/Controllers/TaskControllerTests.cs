@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.Request;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using WebAPI.Services;
 
 namespace WebAPI.Tests.Controllers
 {
@@ -23,7 +24,8 @@ namespace WebAPI.Tests.Controllers
 
             _context = new AplicationContext(options.Options);
             _mockFactory = new Mock<IEntityFactory>();
-            _controller = new TaskController(_context, _mockFactory.Object);
+            var taskService = new TaskService(_context, _mockFactory.Object);
+            _controller = new TaskController(taskService);
         }
 
         private void SetUser(ControllerBase controller, User user)

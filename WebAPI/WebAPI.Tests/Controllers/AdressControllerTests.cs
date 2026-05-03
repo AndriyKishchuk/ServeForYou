@@ -6,6 +6,7 @@ using Moq;
 using WebAPI.Controllers;
 using WebAPI.Factory;
 using WebAPI.Models.Request;
+using WebAPI.Services;
 
 namespace WebAPI.Tests.Controllers
 {
@@ -23,7 +24,8 @@ namespace WebAPI.Tests.Controllers
 
             _context = new AplicationContext(options);
             _factoryMock = new Mock<IEntityFactory>();
-            _controller = new AdressController(_context);
+            var addressService = new AddressService(_context, _factoryMock.Object);
+            _controller = new AdressController(addressService);
         }
 
         [Fact]
@@ -51,7 +53,7 @@ namespace WebAPI.Tests.Controllers
 
             _factoryMock.Setup(f => f.CreateAdress(request)).Returns(address);
 
-            var result = await _controller.CreateAddress(request, _factoryMock.Object);
+            var result = await _controller.CreateAddress(request);
 
             var created = Assert.IsType<CreatedAtActionResult>(result.Result);
             created.ActionName.Should().Be(nameof(AdressController.GetAddress));

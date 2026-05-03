@@ -28,7 +28,8 @@ namespace WebAPI.Tests.Controllers
             _context = new AplicationContext(options);
             _storageMock = new Mock<IFileStorageService>();
             _factoryMock = new Mock<IEntityFactory>();
-            _controller = new FileController(_context, _storageMock.Object, _factoryMock.Object);
+            var fileService = new FileService(_context, _storageMock.Object, _factoryMock.Object);
+            _controller = new FileController(fileService);
         }
 
         private void SetUserClaims(int userId, UserRole role, int companyId, string name = "Test User")

@@ -28,7 +28,8 @@ namespace WebAPI.Tests.Controllers
             _context = new AplicationContext(options);
             _factoryMock = new Mock<IEntityFactory>();
             _jwtServiceMock = new Mock<IJwtService>();
-            _controller = new AuthController(_context, _jwtServiceMock.Object);
+            var authService = new AuthService(_context, _jwtServiceMock.Object, _factoryMock.Object);
+            _controller = new AuthController(authService);
         }
 
         [Fact]
@@ -111,7 +112,7 @@ namespace WebAPI.Tests.Controllers
             _jwtServiceMock.Setup(s => s.GenerateToken(It.IsAny<User>())).Returns("mocked_jwt_token");
 
             //Act 
-            var result = await _controller.Register(registerRequest, _factoryMock.Object);
+            var result = await _controller.Register(registerRequest);
 
             //Assert
             Assert.NotNull(result);
@@ -157,7 +158,7 @@ namespace WebAPI.Tests.Controllers
             _jwtServiceMock.Setup(s => s.GenerateToken(It.IsAny<User>())).Returns("mocked_jwt_token");
 
             //Act
-            var result = await _controller.Register(registerRequest, _factoryMock.Object);
+            var result = await _controller.Register(registerRequest);
 
             //Assert
             var badRequestResult = Assert.IsType<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>(result.Result);
@@ -188,7 +189,7 @@ namespace WebAPI.Tests.Controllers
             );
 
             //Act
-            var result = await _controller.Register(registerRequest, _factoryMock.Object);
+            var result = await _controller.Register(registerRequest);
 
             //Assert
             var badRequestResult = Assert.IsType<Microsoft.AspNetCore.Mvc.BadRequestObjectResult>(result.Result);
@@ -291,7 +292,7 @@ namespace WebAPI.Tests.Controllers
             _jwtServiceMock.Setup(s => s.GenerateToken(It.IsAny<User>())).Returns("mocked_jwt_token");
 
             //Act
-            var result = await _controller.Register(registerRequest, _factoryMock.Object);
+            var result = await _controller.Register(registerRequest);
 
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -321,7 +322,7 @@ namespace WebAPI.Tests.Controllers
             );
 
             //Act
-            var result = await _controller.Register(registerRequest, _factoryMock.Object);
+            var result = await _controller.Register(registerRequest);
 
             //Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
@@ -359,7 +360,7 @@ namespace WebAPI.Tests.Controllers
             _jwtServiceMock.Setup(s => s.GenerateToken(It.IsAny<User>())).Returns("mocked_jwt_token");
 
             //Act
-            var result = await _controller.Register(registerRequest, _factoryMock.Object);
+            var result = await _controller.Register(registerRequest);
 
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
