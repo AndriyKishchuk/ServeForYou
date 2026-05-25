@@ -1,6 +1,15 @@
 ﻿namespace WebAPI.Services
 {
-    public class ManagerListDTO
-    {
-    }
+    public record ManagerListDTO(
+        int Id,
+        string? Name,
+        string? Surname,
+        string? Email,
+        string? CompanyName,
+        string? Role,
+        string? Specialization,
+        double Rating,
+        int RatingCount
+    );
+   
 }

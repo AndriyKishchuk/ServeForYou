@@ -29,20 +29,9 @@ namespace WebAPI.Services
             if (await context.Users.AnyAsync(u => u.Email == request.Email))
                 return new BadRequestObjectResult("Email already in use");
 
-            var company = await context.Companies.FirstOrDefaultAsync(c => c.Id == request.CompanyId)
-                          ?? await context.Companies.FirstOrDefaultAsync(c => c.CompanyName == "ServeForYou");
+            var company = await context.Companies.FirstOrDefaultAsync(i => i.CompanyName == "ServeForYou");
 
-            if (company == null)
-                return new BadRequestObjectResult("Invalid company ID");
-
-            if (request.CompanyId.HasValue && request.CompanyId != company.Id)
-                return new BadRequestObjectResult("Invalid company ID");
-
-            if (!string.Equals(company.CompanyName, "ServeForYou", StringComparison.Ordinal))
-            {
-                company.CompanyName = "ServeForYou";
-                await context.SaveChangesAsync();
-            }
+            if (company == null) return new BadRequestObjectResult("Invalid company ID");
 
             request = request with { CompanyId = company.Id };
 
